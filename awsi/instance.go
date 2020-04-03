@@ -41,10 +41,10 @@ func (t *AWSi) InstanceState() InstanceState {
 	}
 
 	if len(ret.Reservations) == 0 {
-		log.Fatal("インスタンスがありません(1)")
+		log.Fatal("fatal: インスタンスがありません(1)")
 	}
 	if len(ret.Reservations[0].Instances) == 0 {
-		log.Fatal("インスタンスがありません(2)")
+		log.Fatal("fatal: インスタンスがありません(2)")
 	}
 	instance := ret.Reservations[0].Instances[0]
 
@@ -104,16 +104,15 @@ func (t *AWSi) waitInstanceState(tp int) {
 		}
 		time.Sleep(time.Second)
 	}
-	log.Println("タイムアウトしました")
+	log.Println("warn: タイムアウトしました")
 	return
 }
 
-
 func (t *AWSi) InstanceStop() error {
-	log.Printf("*** インスタンスの停止 ***\n")
+	fmt.Printf("*** インスタンスの停止 ***\n")
 
 	if t.InstanceState().StateCode != InstanceStateRunning  {
-		log.Printf("インスタンスは動作していません")
+		log.Printf("warn: インスタンスは動作していません")
 		return nil
 	}
 
@@ -122,16 +121,16 @@ func (t *AWSi) InstanceStop() error {
 		InstanceIds: []*string{ aws.String(t.configs.Target.InstanceID) },
 	})
 	if err != nil { return err }
-	log.Printf("停止開始")
+	fmt.Printf("停止開始")
 	t.waitInstanceState(InstanceStateStopped)
 	return nil
 }
 
 func (t *AWSi) InstanceStart() error {
-	log.Printf("*** インスタンスの起動 ***\n")
+	fmt.Printf("*** インスタンスの起動 ***\n")
 
 	if t.InstanceState().StateCode == InstanceStateRunning  {
-		log.Printf("インスタンスは動作しています")
+		log.Printf("warn: インスタンスは動作しています")
 		return nil
 	}
 
@@ -141,13 +140,13 @@ func (t *AWSi) InstanceStart() error {
 	})
 	if err != nil { return err }
 
-	log.Printf("起動開始")
+	fmt.Printf("起動開始")
 	t.waitInstanceState(InstanceStateRunning)
 	return nil
 }
 
 func (t *AWSi) InstanceStatus() error {
-	log.Printf("*** インスタンスの状態 ***\n")
+	fmt.Printf("*** インスタンスの状態 ***\n")
 	is := t.InstanceState()
 	fmt.Printf("  Name:             %s\n", is.Name)
 	if is.Description != "" {

@@ -14,10 +14,17 @@ func init() {
 		colog.SetMinLevel(colog.LInfo)
 		colog.SetDefaultLevel(colog.LWarning)
 	}
+
+	colors := true
+	if os.Getenv("TERM") != "" {
+		colors = false
+	}
+
 	colog.SetFormatter(&colog.StdFormatter{
-		Colors: true,
+		Colors: colors,
 		Flag:   log.Ldate | log.Ltime | log.Lshortfile,
 	})
+
 	colog.Register()
 }
 
