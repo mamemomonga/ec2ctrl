@@ -77,7 +77,6 @@ func (t *AWSi) InstanceState() InstanceState {
 		return *p
 	}
 
-
 	return InstanceState{
 		Name:             name,
 		Description:      desc,

@@ -77,12 +77,18 @@ rmi:
 
 # マルチアーキテクチャ
 # 対応リスト https://golang.org/doc/install/source#environment
-multiarch:
+multiarch: darwin windows linux linux-arm64 linux-arm
+
+darwin:
 	GOOS=darwin  GOARCH=amd64 $(MAKE) multiarch-build
+windows:
 	GOOS=windows GOARCH=amd64 $(MAKE) multiarch-build
+linux:
 	GOOS=linux   GOARCH=amd64 $(MAKE) multiarch-build
+linux-arm64:
 	GOOS=linux   GOARCH=arm64 $(MAKE) multiarch-build
+linux-arm:
 	GOOS=linux   GOARCH=arm   $(MAKE) multiarch-build
 
-.PHONY: dynamic static build clean multiarch multiarch-build vendor docker rmi
+.PHONY: dynamic static build clean multiarch multiarch-build vendor docker rmi darwin windows linux linux-arm64 linux-arm
 

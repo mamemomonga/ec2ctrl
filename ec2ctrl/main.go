@@ -14,7 +14,10 @@ import (
 var cfg *configs.Configs
 
 func usage() {
-	fmt.Printf("ec2ctrl v%s r:%s\n",buildinfo.Version, buildinfo.Revision)
+	fmt.Println("------------------------------------------------------")
+	fmt.Printf("ec2ctrl %s-%s\n",buildinfo.Version, buildinfo.Revision)
+	fmt.Println("https://github.com/mamemomonga/ec2ctrl")
+	fmt.Println("------------------------------------------------------")
 	fmt.Printf("USAGE: %s [COMMANDS]\n", os.Args[0])
 	fmt.Printf("COMMANDS:\n")
 	for _,i := range cfg.Configs.Targets {
@@ -48,7 +51,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func runner() error {
