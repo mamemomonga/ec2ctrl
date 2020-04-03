@@ -1,0 +1,67 @@
+
+# ユーザ名
+username: "username"
+
+# AWsアカウント
+awses:
+  - name:              "aws01"
+    access_key_id:     "AKIAXXXXXXXXXXXXXXXX"
+    secret_access_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    region:            "ap-northeast-1"
+    account_number:    "012345678901"
+
+# 踏台SSHサーバ
+bastions:
+  - name:     "aws01"
+    # UNIXユーザ名
+    username: "user"
+    # SsHホスト
+    host:     "192.168.10.10"
+
+# ターゲット
+targets:
+  - name:        "aws01-1"
+    description: "ここに詳細説明"
+
+    # awsesで定義したAWSの設定
+    aws:         "aws01"
+
+    # bastionsで定義した踏台サーバの設定
+    bastion:     "aws01"
+ 
+    # 対象のSecurityGroupID
+    group_id:    "sg-01234567890123456"
+
+    # 対象のInstanceID
+    instance_id: "i-00000000000000000"
+
+    # 有効にする機能
+    enables:
+
+       # 自分のIPアドレスのSecurityGroupの登録
+       myip:     true
+ 
+       # インスタンスの起動・停止・参照
+       instance: true
+
+       # リモートデスクトップ接続
+       rdp:      true
+
+       # SSH接続
+       ssh:      true
+
+    # SSH接続情報
+    ssh:
+      username:    "user"
+      # trueの場合は踏台サーバ経由
+      direct:      false
+
+    # RDP接続情報
+    # * 踏台サーバからポートフォワードされる
+    # * RDP接続は情報の表示のみ
+    # * local_portのみSSHポートフォワーディングで使われる
+    rdp:
+      username:   "RDPUSERNAME"
+      password:   "RDPPASSWORD"
+      local_port: 33891
+
