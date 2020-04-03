@@ -3,8 +3,10 @@ package configs
 import (
 	"log"
 	"os"
+	"errors"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"gopkg.in/yaml.v2"
 	"github.com/mitchellh/go-homedir"
 //	"github.com/davecgh/go-spew/spew"
@@ -22,19 +24,56 @@ func New() (t *Configs) {
 }
 
 func (t *Configs) Load() error {
-	homedir, err := homedir.Dir()
-	if err != nil { return err }
 
-	cf := filepath.Join(homedir,".ec2ctrl.yaml")
-	if _, err := os.Stat(cf); os.IsNotExist(err) {
-		log.Printf(" %s ファイルがありません\n",cf)
-		return err
+	sl := []string{}
+	// バイナリと同じ場所か一階層上
+	{
+		exe, err := os.Executable()
+		if err != nil { return err }
+		b, err := filepath.Abs(filepath.Join(filepath.Dir(exe),"."))
+		if err != nil { return err }
+		sl = append(sl,
+			filepath.Join(b,"ec2ctrl.yaml"),
+			filepath.Join(b,"ec2ctrl.yml"),
+			filepath.Join(b,".ec2ctrl.yaml"),
+			filepath.Join(b,".ec2ctrl.yml"),
+			filepath.Join(b,"../ec2ctrl.yaml"),
+			filepath.Join(b,"../ec2ctrl.yml"),
+			filepath.Join(b,"../.ec2ctrl.yaml"),
+			filepath.Join(b,"../.ec2ctrl.yml"),
+		)
+	}
+	// ホームディレクトリ
+	{
+		h, err := homedir.Dir()
+		if err != nil { return err }
+		sl = append(sl,
+			filepath.Join(h,"ec2ctrl.yaml"),
+			filepath.Join(h,"ec2ctrl.yml"),
+			filepath.Join(h,".ec2ctrl.yaml"),
+			filepath.Join(h,".ec2ctrl.yml"),
+		)
+	}
+	configFile := ""
+	for _,i := range sl {
+		if _, err := os.Stat(i); !os.IsNotExist(err) {
+			log.Printf("debug: FOUND %s",i)
+			configFile = i
+			break
+		} else {
+			log.Printf("debug: NOT FOUND %s",i)
+		}
+	}
+	if configFile == "" {
+		log.Println()
+		return errors.New("alert: 設定ファイルがありません")
 	}
 
-	buf, err := ioutil.ReadFile(cf)
+	buf, err := ioutil.ReadFile(configFile)
 	if err != nil { return err }
+	s := regexp.MustCompile(`\r\n|\r|\n`).ReplaceAllString(string(buf),"\n")
+	err = yaml.Unmarshal([]byte(s), &t.Configs)
 
-	err = yaml.Unmarshal(buf, &t.Configs)
 	if err != nil { return err }
 
 	return nil

@@ -3,3 +3,4 @@
 /revision
 /vendor
 *.swp
+/ec2ctrl.yaml

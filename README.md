@@ -8,3 +8,19 @@
 
 	$ cp ec2ctrl-example.yaml ~/.ec2ctrl.yaml
 	$ vim ~/.ec2ctrl.yaml
+
+プログラムは以下の流れで設定ファイルを探します
+
+* [BINDIR]/ec2ctrl.yaml
+* [BINDIR]/ec2ctrl.yml
+* [BINDIR]/.ec2ctrl.yaml
+* [BINDIR]/.ec2ctrl.yml
+* [BINDIR]/../ec2ctrl.yaml
+* [BINDIR]/../ec2ctrl.yml
+* [BINDIR]/../.ec2ctrl.yaml
+* [BINDIR]/../.ec2ctrl.yml
+* [HOMEDIR]/ec2ctrl.yaml
+* [HOMEDIR]/ec2ctrl.yml
+* [HOMEDIR]/.ec2ctrl.yaml
+* [HOMEDIR]/.ec2ctrl.yml
+
