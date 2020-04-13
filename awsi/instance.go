@@ -97,7 +97,7 @@ func (t *AWSi) waitInstanceState(tp int) {
 		is := t.InstanceState()
 		if is.StateCode != tv {
 			tv = is.StateCode
-			log.Printf("  %s\n",is.StateJP)
+			fmt.Printf("  %s\n",is.StateJP)
 		}
 		if is.StateCode == tp {
 			return
@@ -121,15 +121,14 @@ func (t *AWSi) InstanceStop() error {
 		InstanceIds: []*string{ aws.String(t.configs.Target.InstanceID) },
 	})
 	if err != nil { return err }
-	fmt.Printf("停止開始")
+	fmt.Println("停止開始")
 	t.waitInstanceState(InstanceStateStopped)
 	return nil
 }
 
 func (t *AWSi) InstanceStart() error {
 	fmt.Printf("*** インスタンスの起動 ***\n")
-
-	if t.InstanceState().StateCode == InstanceStateRunning  {
+if t.InstanceState().StateCode == InstanceStateRunning  {
 		log.Printf("warn: インスタンスは動作しています")
 		return nil
 	}
@@ -140,7 +139,7 @@ func (t *AWSi) InstanceStart() error {
 	})
 	if err != nil { return err }
 
-	fmt.Printf("起動開始")
+	fmt.Println("起動開始")
 	t.waitInstanceState(InstanceStateRunning)
 	return nil
 }
