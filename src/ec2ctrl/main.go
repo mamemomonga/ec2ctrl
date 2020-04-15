@@ -5,10 +5,10 @@ import (
 	"log"
 	"os"
 	//	"github.com/davecgh/go-spew/spew"
-	"github.com/mamemomonga/ec2ctrl/awsi"
-	"github.com/mamemomonga/ec2ctrl/commands"
-	"github.com/mamemomonga/ec2ctrl/configs"
-	"github.com/mamemomonga/ec2ctrl/ec2ctrl/buildinfo"
+	"github.com/mamemomonga/ec2ctrl/src/awsi"
+	"github.com/mamemomonga/ec2ctrl/src/commands"
+	"github.com/mamemomonga/ec2ctrl/src/configs"
+	"github.com/mamemomonga/ec2ctrl/src/ec2ctrl/buildinfo"
 	"github.com/spf13/cobra"
 )
 

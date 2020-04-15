@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/mamemomonga/ec2ctrl/awsi"
-	"github.com/mamemomonga/ec2ctrl/configs"
+	"github.com/mamemomonga/ec2ctrl/src/awsi"
+	"github.com/mamemomonga/ec2ctrl/src/configs"
 	"log"
 	"os"
 	"os/exec"

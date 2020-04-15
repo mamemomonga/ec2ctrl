@@ -6,7 +6,7 @@ BUILDINFO_IMPORT := $(shell cat go.mod | grep module | awk '{ print $$2 }')/$(NA
 BINDIR := bin
 
 # ソースのあるディレクトリ
-SRCDIR := .
+SRCDIR := ./src
 
 # バージョン
 VERSION   := v$(shell cat version)

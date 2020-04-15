@@ -59,6 +59,7 @@ github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORN
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
+github.com/mamemomonga/ec2ctrl v0.0.7 h1:B+SUiwWEkqq5s+Z4/aT86FZhmikgokqGPiN8OTbVNWc=
 github.com/mamemomonga/go-confstate v0.0.0-20190918033548-c4125580f013 h1:UX/rAo78ujTBWHzlCtnFDttLJtkYmT4JmARdV9pqUnU=
 github.com/mamemomonga/go-confstate v0.0.0-20190918033548-c4125580f013/go.mod h1:gvrfM8F1fUBTI4dezVmSqFlPRTsh0u5nx4Lx7wwg5rg=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
