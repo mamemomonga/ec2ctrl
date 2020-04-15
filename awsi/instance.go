@@ -1,12 +1,12 @@
 package awsi
 
 import (
-    "log"
 	"fmt"
-	"time"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-//	"github.com/davecgh/go-spew/spew"
+	"log"
+	"time"
+	//	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -34,7 +34,7 @@ type InstanceState struct {
 func (t *AWSi) InstanceState() InstanceState {
 	svc := ec2.New(t.session)
 	ret, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{
-		InstanceIds: []*string{ aws.String(t.configs.Target.InstanceID) },
+		InstanceIds: []*string{aws.String(t.configs.Target.InstanceID)},
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -65,13 +65,17 @@ func (t *AWSi) InstanceState() InstanceState {
 	}
 	name := ""
 	desc := ""
-	for _,i := range instance.Tags {
-		if *i.Key == "Name"        { name = *i.Value }
-		if *i.Key == "Description" { desc = *i.Value }
+	for _, i := range instance.Tags {
+		if *i.Key == "Name" {
+			name = *i.Value
+		}
+		if *i.Key == "Description" {
+			desc = *i.Value
+		}
 	}
 
 	rev := func(p *string) string {
-		if(p == nil) {
+		if p == nil {
 			return ""
 		}
 		return *p
@@ -97,7 +101,7 @@ func (t *AWSi) waitInstanceState(tp int) {
 		is := t.InstanceState()
 		if is.StateCode != tv {
 			tv = is.StateCode
-			fmt.Printf("  %s\n",is.StateJP)
+			fmt.Printf("  %s\n", is.StateJP)
 		}
 		if is.StateCode == tp {
 			return
@@ -111,16 +115,18 @@ func (t *AWSi) waitInstanceState(tp int) {
 func (t *AWSi) InstanceStop() error {
 	fmt.Printf("*** インスタンスの停止 ***\n")
 
-	if t.InstanceState().StateCode != InstanceStateRunning  {
+	if t.InstanceState().StateCode != InstanceStateRunning {
 		log.Printf("warn: インスタンスは動作していません")
 		return nil
 	}
 
 	svc := ec2.New(t.session)
 	_, err := svc.StopInstances(&ec2.StopInstancesInput{
-		InstanceIds: []*string{ aws.String(t.configs.Target.InstanceID) },
+		InstanceIds: []*string{aws.String(t.configs.Target.InstanceID)},
 	})
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	fmt.Println("停止開始")
 	t.waitInstanceState(InstanceStateStopped)
 	return nil
@@ -128,16 +134,18 @@ func (t *AWSi) InstanceStop() error {
 
 func (t *AWSi) InstanceStart() error {
 	fmt.Printf("*** インスタンスの起動 ***\n")
-if t.InstanceState().StateCode == InstanceStateRunning  {
+	if t.InstanceState().StateCode == InstanceStateRunning {
 		log.Printf("warn: インスタンスは動作しています")
 		return nil
 	}
 
 	svc := ec2.New(t.session)
 	_, err := svc.StartInstances(&ec2.StartInstancesInput{
-		InstanceIds: []*string{ aws.String(t.configs.Target.InstanceID) },
+		InstanceIds: []*string{aws.String(t.configs.Target.InstanceID)},
 	})
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("起動開始")
 	t.waitInstanceState(InstanceStateRunning)
@@ -161,4 +169,3 @@ func (t *AWSi) InstanceStatus() error {
 	fmt.Printf("  State:            %s(%s)\n", is.StateJP, is.StateName)
 	return nil
 }
-

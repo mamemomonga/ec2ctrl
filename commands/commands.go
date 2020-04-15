@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"github.com/mamemomonga/ec2ctrl/configs"
-	"github.com/mamemomonga/ec2ctrl/awsi"
-	"github.com/davecgh/go-spew/spew"
-	"log"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/mamemomonga/ec2ctrl/awsi"
+	"github.com/mamemomonga/ec2ctrl/configs"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -17,7 +17,7 @@ type Commands struct {
 
 func New(configs *configs.Configs, ai *awsi.AWSi) *Commands {
 	t := new(Commands)
-	t.ai      = ai
+	t.ai = ai
 	t.configs = configs
 	return t
 }
@@ -26,7 +26,7 @@ func (t *Commands) runCommand(c string, p ...string) error {
 	cmd := exec.Command(c, p...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Stdin  = os.Stdin
+	cmd.Stdin = os.Stdin
 	if err := cmd.Start(); err != nil {
 		return err
 	}
@@ -37,8 +37,8 @@ func (t *Commands) runCommand(c string, p ...string) error {
 }
 
 type SSHLoginCmdS struct {
-	option      string
-	connection  string
+	option     string
+	connection string
 }
 
 func (t *Commands) SSHLoginCmd() SSHLoginCmdS {
@@ -47,16 +47,16 @@ func (t *Commands) SSHLoginCmd() SSHLoginCmdS {
 		return SSHLoginCmdS{
 			connection: fmt.Sprintf("%s@%s",
 				t.configs.Target.SSH.Username,
-				is.PublicIpAddress ),
+				is.PublicIpAddress),
 		}
 	} else {
 		return SSHLoginCmdS{
-			option: fmt.Sprintf( "ProxyCommand ssh %s@%s -W %%h:%%p 2> /dev/null",
+			option: fmt.Sprintf("ProxyCommand ssh %s@%s -W %%h:%%p 2> /dev/null",
 				t.configs.Target.Bastion.Username,
-				t.configs.Target.Bastion.Host ),
-			connection: fmt.Sprintf( "%s@%s",
+				t.configs.Target.Bastion.Host),
+			connection: fmt.Sprintf("%s@%s",
 				t.configs.Target.SSH.Username,
-				is.PrivateIpAddress ),
+				is.PrivateIpAddress),
 		}
 	}
 }
@@ -68,9 +68,9 @@ func (t *Commands) SSHLogin(args []string) {
 		ag = append(ag, "-o", sl.option)
 	}
 	ag = append(ag, args...)
-	ag = append(ag, sl.connection )
-	log.Printf("debug: %s",spew.Sdump(ag))
-	t.runCommand("ssh",ag...)
+	ag = append(ag, sl.connection)
+	log.Printf("debug: %s", spew.Sdump(ag))
+	t.runCommand("ssh", ag...)
 }
 
 func (t *Commands) RDPConnect() {
@@ -79,21 +79,20 @@ func (t *Commands) RDPConnect() {
 		"-N", "-L",
 		fmt.Sprintf("127.0.0.1:%s:%s:3389",
 			t.configs.Target.RDP.LocalPort,
-			is.PrivateIpAddress ),
+			is.PrivateIpAddress),
 		fmt.Sprintf("%s@%s",
 			t.configs.Target.Bastion.Username,
-			t.configs.Target.Bastion.Host ),
+			t.configs.Target.Bastion.Host),
 	}
 	fmt.Println("リモートデスクトップ接続から以下の情報で接続してください")
-	fmt.Printf("   [ ホスト名   ] localhost:%s\n", t.configs.Target.RDP.LocalPort )
+	fmt.Printf("   [ ホスト名   ] localhost:%s\n", t.configs.Target.RDP.LocalPort)
 	if t.configs.Target.RDP.Username != "" {
-		fmt.Printf("   [ ユーザ名   ] %s\n", t.configs.Target.RDP.Username  )
+		fmt.Printf("   [ ユーザ名   ] %s\n", t.configs.Target.RDP.Username)
 	}
 	if t.configs.Target.RDP.Password != "" {
-		fmt.Printf("   [ パスワード ] %s\n", t.configs.Target.RDP.Password  )
+		fmt.Printf("   [ パスワード ] %s\n", t.configs.Target.RDP.Password)
 	}
 	fmt.Println("ポートフォワーディングを開始しました。CTRL+Cで切断")
-	t.runCommand("ssh",args...)
+	t.runCommand("ssh", args...)
 
 }
-

@@ -1,36 +1,36 @@
 package awsi
 
 import (
-    "log"
-	"fmt"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-//	"github.com/davecgh/go-spew/spew"
+	"io/ioutil"
+	"log"
+	"net/http"
+	//	"github.com/davecgh/go-spew/spew"
 )
 
-func (t *AWSi) myIPDeleteCurrent( groupid, mmyip, mdesc string ) (bool,error) {
+func (t *AWSi) myIPDeleteCurrent(groupid, mmyip, mdesc string) (bool, error) {
 	svc := ec2.New(t.session)
 
 	// 現在の設定を取得
 	current, err := svc.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
-		GroupIds: aws.StringSlice( []string{groupid} ),
+		GroupIds: aws.StringSlice([]string{groupid}),
 	})
 	if err != nil {
-		return false,err
+		return false, err
 	}
 	if len(current.SecurityGroups[0].IpPermissions) == 0 {
-		return false,nil
+		return false, nil
 	}
 	if len(current.SecurityGroups[0].IpPermissions[0].IpRanges) == 0 {
-		return false,nil
+		return false, nil
 	}
 
 	// すでに存在するIPアドレス・詳細を含む項目を削除する
-	for _,ipp := range current.SecurityGroups[0].IpPermissions {
-		for _,ipr := range ipp.IpRanges {
+	for _, ipp := range current.SecurityGroups[0].IpPermissions {
+		for _, ipr := range ipp.IpRanges {
 
 			flag := false
 			ipranges := []*ec2.IpRange{}
@@ -45,7 +45,7 @@ func (t *AWSi) myIPDeleteCurrent( groupid, mmyip, mdesc string ) (bool,error) {
 			if mdesc == *ipr.Description {
 				flag = true
 				ipranges = []*ec2.IpRange{{
-					CidrIp: ipr.CidrIp,
+					CidrIp:      ipr.CidrIp,
 					Description: aws.String(mdesc),
 				}}
 			}
@@ -54,7 +54,7 @@ func (t *AWSi) myIPDeleteCurrent( groupid, mmyip, mdesc string ) (bool,error) {
 				continue
 			}
 			// 削除実行
-			_,err := svc.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput {
+			_, err := svc.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput{
 				GroupId: aws.String(groupid),
 				IpPermissions: []*ec2.IpPermission{{
 					IpProtocol: aws.String("tcp"),
@@ -63,18 +63,20 @@ func (t *AWSi) myIPDeleteCurrent( groupid, mmyip, mdesc string ) (bool,error) {
 					IpRanges:   ipranges,
 				}},
 			})
-			if err != nil { return false,err }
-			return true,nil
+			if err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 	}
-	return false,nil
+	return false, nil
 }
 
-func (t *AWSi) myIPAdd( groupid, mmyip, mdesc string ) error {
+func (t *AWSi) myIPAdd(groupid, mmyip, mdesc string) error {
 	svc := ec2.New(t.session)
 
 	// 新しい設定
-	_, err := svc.AuthorizeSecurityGroupIngress( &ec2.AuthorizeSecurityGroupIngressInput{
+	_, err := svc.AuthorizeSecurityGroupIngress(&ec2.AuthorizeSecurityGroupIngressInput{
 		GroupId: aws.String(groupid),
 		IpPermissions: []*ec2.IpPermission{{
 			FromPort:   aws.Int64(22),
@@ -84,7 +86,7 @@ func (t *AWSi) myIPAdd( groupid, mmyip, mdesc string ) error {
 				CidrIp:      aws.String(mmyip),
 				Description: aws.String(mdesc),
 			}},
-        }},
+		}},
 	})
 	if err != nil {
 		return err
@@ -96,14 +98,14 @@ func (t *AWSi) MyIPSet() error {
 	fmt.Printf("*** 許可IPアドレスの追加・更新 ***\n")
 	myip := t.getMyIP()
 
-	mmyip := fmt.Sprintf("%s/32",myip)
-	mdesc := fmt.Sprintf("rmt-%s",t.configs.Configs.Username)
+	mmyip := fmt.Sprintf("%s/32", myip)
+	mdesc := fmt.Sprintf("rmt-%s", t.configs.Configs.Username)
 
-	fmt.Printf("  SecurityGroupID: %s\n",t.configs.Target.GroupID)
-	fmt.Printf("  許可IP:          %s\n",mmyip)
-	fmt.Printf("  Description:     %s\n",mdesc)
+	fmt.Printf("  SecurityGroupID: %s\n", t.configs.Target.GroupID)
+	fmt.Printf("  許可IP:          %s\n", mmyip)
+	fmt.Printf("  Description:     %s\n", mdesc)
 
-	deleted,err := t.myIPDeleteCurrent(t.configs.Target.GroupID, mmyip, mdesc)
+	deleted, err := t.myIPDeleteCurrent(t.configs.Target.GroupID, mmyip, mdesc)
 	if err != nil {
 		return err
 	}
@@ -123,11 +125,11 @@ func (t *AWSi) MyIPSet() error {
 func (t *AWSi) MyIPDel() error {
 	fmt.Printf("*** 許可IPアドレスの削除 ***\n")
 
-	mdesc := fmt.Sprintf("rmt-%s",t.configs.Configs.Username)
+	mdesc := fmt.Sprintf("rmt-%s", t.configs.Configs.Username)
 	fmt.Printf("   SecurityGroupID: %s\n", t.configs.Target.GroupID)
 	fmt.Printf("   Description:     %s\n", mdesc)
 
-	deleted,err := t.myIPDeleteCurrent(t.configs.Target.GroupID, "" , mdesc)
+	deleted, err := t.myIPDeleteCurrent(t.configs.Target.GroupID, "", mdesc)
 	if err != nil {
 		return err
 	}
@@ -154,11 +156,10 @@ func (t *AWSi) getMyIP() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var b httpBin;
+	var b httpBin
 	err = json.Unmarshal([]byte(body), &b)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return string(b.Origin)
 }
-

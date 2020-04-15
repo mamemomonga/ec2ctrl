@@ -1,15 +1,15 @@
 package main
 
 import (
-	"log"
 	"fmt"
+	"log"
 	"os"
-//	"github.com/davecgh/go-spew/spew"
-	"github.com/spf13/cobra"
+	//	"github.com/davecgh/go-spew/spew"
 	"github.com/mamemomonga/ec2ctrl/awsi"
 	"github.com/mamemomonga/ec2ctrl/commands"
 	"github.com/mamemomonga/ec2ctrl/configs"
 	"github.com/mamemomonga/ec2ctrl/ec2ctrl/buildinfo"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func (t *Runner) Cobra() *cobra.Command {
 
 	r := &cobra.Command{Use: os.Args[0]}
 	r.AddCommand(c...)
-	r.Version = fmt.Sprintf("%s-%s",buildinfo.Version, buildinfo.Revision)
+	r.Version = fmt.Sprintf("%s-%s", buildinfo.Version, buildinfo.Revision)
 	r.SetUsageTemplate(t.templateUsage())
 	r.SetHelpTemplate(t.templateHelp())
 	return r
@@ -98,10 +98,10 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 	}
 	if i.Enables.SSH {
 		c0 := &cobra.Command{
-			Use:   "ssh",
-			Short: "SSH接続 オプションはSSHコマンドに引き継がれます",
+			Use:                "ssh",
+			Short:              "SSH接続 オプションはSSHコマンドに引き継がれます",
 			DisableFlagParsing: true,
-			Run:  func(cmd *cobra.Command, args []string) {
+			Run: func(cmd *cobra.Command, args []string) {
 				t.cfg.SetTarget(i.Name)
 				ai := awsi.New(t.cfg)
 				commands.New(t.cfg, ai).SSHLogin(args)
@@ -120,10 +120,8 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 	return c
 }
 
-
 func (t *Runner) actionSSHLogin(args []string) {
 }
-
 
 func (t *Runner) action(target string, action string) {
 	t.cfg.SetTarget(target)
@@ -188,5 +186,3 @@ ec2ctrl - EC2コントロールツール{{with (or .Long .Short)}}
 `
 
 }
-
-
