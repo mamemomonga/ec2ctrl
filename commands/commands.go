@@ -3,7 +3,8 @@ package commands
 import (
 	"github.com/mamemomonga/ec2ctrl/configs"
 	"github.com/mamemomonga/ec2ctrl/awsi"
-//	"log"
+	"github.com/davecgh/go-spew/spew"
+	"log"
 	"fmt"
 	"os"
 	"os/exec"
@@ -35,35 +36,41 @@ func (t *Commands) runCommand(c string, p ...string) error {
 	return nil
 }
 
-func (t *Commands) SSHLogin(run bool) {
+type SSHLoginCmdS struct {
+	option      string
+	connection  string
+}
+
+func (t *Commands) SSHLoginCmd() SSHLoginCmdS {
 	is := t.ai.InstanceState()
-	args := []string{}
 	if t.configs.Target.SSH.Direct {
-		args=[]string{
-			fmt.Sprintf("%s@%s",
+		return SSHLoginCmdS{
+			connection: fmt.Sprintf("%s@%s",
 				t.configs.Target.SSH.Username,
 				is.PublicIpAddress ),
 		}
 	} else {
-		args=[]string{
-			"-o",
-			fmt.Sprintf( "ProxyCommand ssh %s@%s -W %%h:%%p 2> /dev/null",
+		return SSHLoginCmdS{
+			option: fmt.Sprintf( "ProxyCommand ssh %s@%s -W %%h:%%p 2> /dev/null",
 				t.configs.Target.Bastion.Username,
 				t.configs.Target.Bastion.Host ),
-			fmt.Sprintf( "%s@%s",
+			connection: fmt.Sprintf( "%s@%s",
 				t.configs.Target.SSH.Username,
 				is.PrivateIpAddress ),
 		}
 	}
-	if(run) {
-		t.runCommand("ssh",args...)
-	} else {
-		if t.configs.Target.SSH.Direct {
-			fmt.Printf("ssh %s\n",args[0])
-		} else {
-			fmt.Printf("ssh %s \"%s\" %s\n",args[0],args[1],args[2])
-		}
+}
+
+func (t *Commands) SSHLogin(args []string) {
+	ag := []string{}
+	sl := t.SSHLoginCmd()
+	if sl.option != "" {
+		ag = append(ag, "-o", sl.option)
 	}
+	ag = append(ag, args...)
+	ag = append(ag, sl.connection )
+	log.Printf("debug: %s",spew.Sdump(ag))
+	t.runCommand("ssh",ag...)
 }
 
 func (t *Commands) RDPConnect() {
