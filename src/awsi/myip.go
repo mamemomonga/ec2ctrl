@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	//	"github.com/davecgh/go-spew/spew"
+//	"github.com/davecgh/go-spew/spew"
 )
 
 func (t *AWSi) myIPDeleteCurrent(groupid, mmyip, mdesc string) (bool, error) {
@@ -21,52 +21,47 @@ func (t *AWSi) myIPDeleteCurrent(groupid, mmyip, mdesc string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if len(current.SecurityGroups[0].IpPermissions) == 0 {
-		return false, nil
-	}
-	if len(current.SecurityGroups[0].IpPermissions[0].IpRanges) == 0 {
-		return false, nil
-	}
 
 	// すでに存在するIPアドレス・詳細を含む項目を削除する
-	for _, ipp := range current.SecurityGroups[0].IpPermissions {
-		for _, ipr := range ipp.IpRanges {
-
-			flag := false
-			ipranges := []*ec2.IpRange{}
-			// 自分のIPを含んでいたら消す
-			if mmyip == *ipr.CidrIp {
-				flag = true
-				ipranges = []*ec2.IpRange{{
-					CidrIp: aws.String(mmyip),
-				}}
+	for _,sg := range current.SecurityGroups {
+		for _, ipp := range sg.IpPermissions {
+			for _, ipr := range ipp.IpRanges {
+				flag := false
+				ipranges := []*ec2.IpRange{}
+				// 自分のIPを含んでいたら消す
+				if mmyip == *ipr.CidrIp {
+					flag = true
+					ipranges = []*ec2.IpRange{{
+						CidrIp: aws.String(mmyip),
+					}}
+				}
+				// 自分の設定した項目なら消す
+				if mdesc == *ipr.Description {
+					flag = true
+					ipranges = []*ec2.IpRange{{
+						CidrIp:      ipr.CidrIp,
+						Description: aws.String(mdesc),
+					}}
+				}
+				// 削除項目なし
+				if !flag {
+					continue
+				}
+				// 削除実行
+				_, err := svc.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput{
+					GroupId: aws.String(groupid),
+					IpPermissions: []*ec2.IpPermission{{
+						IpProtocol: aws.String("tcp"),
+						FromPort:   aws.Int64(22),
+						ToPort:     aws.Int64(22),
+						IpRanges:   ipranges,
+					}},
+				})
+				if err != nil {
+					return false, err
+				}
+				return true, nil
 			}
-			// 自分の設定した項目なら消す
-			if mdesc == *ipr.Description {
-				flag = true
-				ipranges = []*ec2.IpRange{{
-					CidrIp:      ipr.CidrIp,
-					Description: aws.String(mdesc),
-				}}
-			}
-			// 削除項目なし
-			if !flag {
-				continue
-			}
-			// 削除実行
-			_, err := svc.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput{
-				GroupId: aws.String(groupid),
-				IpPermissions: []*ec2.IpPermission{{
-					IpProtocol: aws.String("tcp"),
-					FromPort:   aws.Int64(22),
-					ToPort:     aws.Int64(22),
-					IpRanges:   ipranges,
-				}},
-			})
-			if err != nil {
-				return false, err
-			}
-			return true, nil
 		}
 	}
 	return false, nil
@@ -134,7 +129,7 @@ func (t *AWSi) MyIPDel() error {
 		return err
 	}
 	if deleted {
-		fmt.Printf("以前の設定を削除しました")
+		fmt.Printf("以前の設定を削除しました\n")
 	}
 
 	return nil
