@@ -1,12 +1,12 @@
-# buildinfo の インポートパス
-# プロジェクトのImport Pathはgo.modから取得する
-BUILDINFO_IMPORT := $(shell cat go.mod | grep module | awk '{ print $$2 }')/$(NAME)/buildinfo
-
 # 出力ディレクトリ
 BINDIR := bin
 
 # ソースのあるディレクトリ
 SRCDIR := ./src
+
+# buildinfo の インポートパス
+# プロジェクトのImport Pathはgo.modから取得する
+BUILDINFO_IMPORT := $(shell cat go.mod | grep module | awk '{ print $$2 }')/src/${NAME}/buildinfo
 
 # バージョン
 VERSION   := v$(shell cat version)

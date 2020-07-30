@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	//	"github.com/davecgh/go-spew/spew"
 	"github.com/mamemomonga/ec2ctrl/src/awsi"
 	"github.com/mamemomonga/ec2ctrl/src/commands"
@@ -44,7 +45,6 @@ func (t *Runner) Cobra() *cobra.Command {
 
 	r := &cobra.Command{Use: os.Args[0]}
 	r.AddCommand(c...)
-	r.Version = fmt.Sprintf("%s-%s", buildinfo.Version, buildinfo.Revision)
 	r.SetUsageTemplate(t.templateUsage())
 	r.SetHelpTemplate(t.templateHelp())
 	return r
@@ -98,8 +98,8 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 	}
 	if i.Enables.SSH {
 		c0 := &cobra.Command{
-			Use:                "ssh",
-			Short:              "SSH接続 引数はそのままSSHコマンドに引き継がれます。ハイフンがあるとその先の引数はコマンドとして解釈されます。",
+			Use:   "ssh",
+			Short: "SSH接続 引数はそのままSSHコマンドに引き継がれます。ハイフンがあるとその先の引数はコマンドとして解釈されます。",
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				t.cfg.SetTarget(i.Name)
@@ -178,11 +178,17 @@ func (t *Runner) templateUsage() string {
 }
 
 func (t *Runner) templateHelp() string {
-	return `====================================
-ec2ctrl - EC2コントロールツール{{with (or .Long .Short)}}
+
+	log.Println(buildinfo.Version)
+
+	s := fmt.Sprintf(`
+====================================
+ec2ctrl EC2コントロールツール %s-%s {{with (or .Long .Short)}}
   {{. | trimTrailingWhitespaces}}{{end}}
 ====================================
 {{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}
-`
+`,buildinfo.Version, buildinfo.Revision)
 
+	return strings.TrimLeft(s,"\n")
 }
+
