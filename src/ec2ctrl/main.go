@@ -178,9 +178,6 @@ func (t *Runner) templateUsage() string {
 }
 
 func (t *Runner) templateHelp() string {
-
-	log.Println(buildinfo.Version)
-
 	s := fmt.Sprintf(`
 ====================================
 ec2ctrl EC2コントロールツール %s-%s {{with (or .Long .Short)}}
@@ -188,7 +185,6 @@ ec2ctrl EC2コントロールツール %s-%s {{with (or .Long .Short)}}
 ====================================
 {{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}
 `,buildinfo.Version, buildinfo.Revision)
-
 	return strings.TrimLeft(s,"\n")
 }
 
