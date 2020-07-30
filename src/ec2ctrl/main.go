@@ -99,7 +99,7 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 	if i.Enables.SSH {
 		c0 := &cobra.Command{
 			Use:                "ssh",
-			Short:              "SSH接続 オプションはSSHコマンドに引き継がれます",
+			Short:              "SSH接続 引数はそのままSSHコマンドに引き継がれます。ハイフンがあるとその先の引数はコマンドとして解釈されます。",
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				t.cfg.SetTarget(i.Name)

@@ -62,14 +62,33 @@ func (t *Commands) SSHLoginCmd() SSHLoginCmdS {
 }
 
 func (t *Commands) SSHLogin(args []string) {
+
+	opts := []string{}
+	cmds := []string{}
+	{
+		f := false
+		for _,v := range args {
+			if v == "-" {
+				f = true
+				continue
+			}
+			if f {
+				cmds = append(cmds,v)
+			} else {
+				opts = append(opts,v)
+			}
+		}
+	}
+
 	ag := []string{}
 	sl := t.SSHLoginCmd()
 	if sl.option != "" {
 		ag = append(ag, "-o", sl.option)
 	}
-	ag = append(ag, args...)
+	ag = append(ag, opts...)
 	ag = append(ag, sl.connection)
-	log.Printf("debug: %s", spew.Sdump(ag))
+	ag = append(ag, cmds...)
+	log.Printf("debug: args %s", spew.Sdump(ag))
 	t.runCommand("ssh", ag...)
 }
 
