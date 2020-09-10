@@ -59,9 +59,8 @@ targets:
     # RDP接続情報
     # * 踏台サーバからポートフォワードされる
     # * RDP接続は情報の表示のみ
-    # * local_portのみSSHポートフォワーディングで使われる
+    # * ローカル側のRDPポートは33891から33900の間で開いているものが自動的に使用される
     rdp:
       username:   "RDPUSERNAME"
       password:   "RDPPASSWORD"
-      local_port: 33891
 

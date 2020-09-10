@@ -43,7 +43,6 @@ type CTargetEnables struct {
 type CTargetRDP struct {
 	Username  string `yaml:"username"`
 	Password  string `yaml:"password"`
-	LocalPort string `yaml:"local_port"`
 }
 
 type CTargetSSH struct {

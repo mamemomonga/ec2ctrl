@@ -5,6 +5,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mamemomonga/ec2ctrl/src/awsi"
 	"github.com/mamemomonga/ec2ctrl/src/configs"
+	"github.com/mamemomonga/ec2ctrl/src/freeport"
 	"log"
 	"os"
 	"os/exec"
@@ -93,18 +94,24 @@ func (t *Commands) SSHLogin(args []string) {
 }
 
 func (t *Commands) RDPConnect() {
+
+	port,err := freeport.SearchTCP(33891,33900)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	is := t.ai.InstanceState()
 	args := []string{
 		"-N", "-L",
-		fmt.Sprintf("127.0.0.1:%s:%s:3389",
-			t.configs.Target.RDP.LocalPort,
+		fmt.Sprintf("127.0.0.1:%d:%s:3389",
+			port,
 			is.PrivateIpAddress),
 		fmt.Sprintf("%s@%s",
 			t.configs.Target.Bastion.Username,
 			t.configs.Target.Bastion.Host),
 	}
 	fmt.Println("リモートデスクトップ接続から以下の情報で接続してください")
-	fmt.Printf("   [ ホスト名   ] localhost:%s\n", t.configs.Target.RDP.LocalPort)
+	fmt.Printf("   [ ホスト名   ] localhost:%d\n", port)
 	if t.configs.Target.RDP.Username != "" {
 		fmt.Printf("   [ ユーザ名   ] %s\n", t.configs.Target.RDP.Username)
 	}
