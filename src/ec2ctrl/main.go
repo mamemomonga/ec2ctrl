@@ -99,7 +99,12 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 	if i.Enables.SSH {
 		c0 := &cobra.Command{
 			Use:   "ssh",
-			Short: "SSH接続 引数はそのままSSHコマンドに引き継がれます。ハイフンがあるとその先の引数はコマンドとして解釈されます。",
+			Short: "SSH関連操作",
+		}
+		c1 := &cobra.Command{
+			Use:   "con",
+			Short: "SSH接続",
+			Long: "引数はそのままSSHコマンドに引き継がれます。ハイフンがあるとその先の引数はコマンドとして解釈されます。",
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				t.cfg.SetTarget(i.Name)
@@ -107,6 +112,16 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 				commands.New(t.cfg, ai).SSHLogin(args)
 			},
 		}
+		c2 := &cobra.Command{
+			Use:  "show",
+			Short: "SSHコマンドを表示します",
+			Run: func(cmd *cobra.Command, args []string) {
+				t.cfg.SetTarget(i.Name)
+				ai := awsi.New(t.cfg)
+				commands.New(t.cfg, ai).SSHLoginCmdShow(args)
+			},
+		}
+		c0.AddCommand(c1, c2)
 		c.AddCommand(c0)
 	}
 	if i.Enables.RDP {
@@ -118,9 +133,6 @@ func (t *Runner) subCommands(i configs.CTarget) *cobra.Command {
 		c.AddCommand(c0)
 	}
 	return c
-}
-
-func (t *Runner) actionSSHLogin(args []string) {
 }
 
 func (t *Runner) action(target string, action string) {
@@ -143,6 +155,7 @@ func (t *Runner) action(target string, action string) {
 		err = ai.InstanceStart()
 	case "RDP":
 		cm.RDPConnect()
+
 	}
 
 	if err != nil {
