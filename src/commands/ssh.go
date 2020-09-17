@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"log"
 	"strings"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 type sshProxyOptOutput struct {
